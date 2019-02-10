@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import com.hopding.pdflib.factories.PDPageFactory;
+import com.hopding.pdflib.factories.PDDocumentFactory;
+
 
 public class PDFLibModule extends ReactContextBaseJavaModule {
 
@@ -42,6 +44,8 @@ public class PDFLibModule extends ReactContextBaseJavaModule {
 
     PDFBoxResourceLoader.init(reactContext);
     PDPageFactory.init(reactContext);
+        PDDocumentFactory.init(reactContext);
+
   }
 
   @Override
@@ -67,7 +71,7 @@ public class PDFLibModule extends ReactContextBaseJavaModule {
   public void modifyPDF(ReadableMap documentActions, Promise promise) {
     try {
       PDDocument document = PDDocumentFactory.modify(documentActions);
-      promise.resolve(PDDocumentFactory.write(document, documentActions.getString("path")));
+      promise.resolve(PDDocumentFactory.write(document, documentActions.getString("targetPath")));
     } catch (NoSuchKeyException e) {
       e.printStackTrace();
       promise.reject(e);
@@ -167,5 +171,4 @@ public class PDFLibModule extends ReactContextBaseJavaModule {
       promise.reject(e);
     }
   }
-
 }

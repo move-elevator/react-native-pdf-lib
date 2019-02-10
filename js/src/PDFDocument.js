@@ -8,6 +8,7 @@ export type DocumentAction = {
   path: string,
   pages: PageAction[],
   modifyPages?: PageAction[],
+  targetPath: string
 };
 
 /**
@@ -17,6 +18,7 @@ export default class PDFDocument {
   document: DocumentAction = {
     path: '',
     pages: [],
+    targetPath: ''
   };
 
   /**
@@ -30,11 +32,22 @@ export default class PDFDocument {
     return pdfDocument;
   }
 
-  static modify = (path: string) => {
+  static modify = (path: string, targetPath: string) => {
     const pdfDocument = new PDFDocument();
     pdfDocument.setPath(path);
+
+    pdfDocument.setTargetPath(targetPath);
+    if (targetPath === '') {
+      pdfDocument.setTargetPath(path);
+    }
+
     pdfDocument.document.modifyPages = [];
     return pdfDocument;
+  }
+
+  setTargetPath  = (targetPath: string) => {
+    this.document.targetPath = targetPath;
+    return this;
   }
 
   setPath = (path: string) => {
@@ -45,14 +58,14 @@ export default class PDFDocument {
   modifyPage = ({ page }: PDFPage) => {
     if (page.pageIndex === undefined) {
       throw new Error(
-        'Pages created with Page.create() must be added to document with ' +
-        'PDFDocument.addPage(), instead of PDFDocument.modifyPage()'
+          'Pages created with Page.create() must be added to document with ' +
+          'PDFDocument.addPage(), instead of PDFDocument.modifyPage()'
       );
     }
     if (this.document.modifyPages === undefined) {
       throw new Error(
-        'Cannot modify pages on PDFDocument initialized with PDFDocument.create(),' +
-        ' please use PDFDocument.modify()'
+          'Cannot modify pages on PDFDocument initialized with PDFDocument.create(),' +
+          ' please use PDFDocument.modify()'
       )
     }
     this.document.modifyPages.push(page);
@@ -69,8 +82,8 @@ export default class PDFDocument {
   addPage = ({ page }: PDFPage) => {
     if (page.pageIndex !== undefined) {
       throw new Error(
-        'Pages created with Page.modify() must be added to document with ' +
-        'PDFDocument.modifyPage(), instead of PDFDocument.addPage()'
+          'Pages created with Page.modify() must be added to document with ' +
+          'PDFDocument.modifyPage(), instead of PDFDocument.addPage()'
       );
     }
     this.document.pages.push(page);
@@ -91,11 +104,14 @@ export default class PDFDocument {
       return Promise.reject('PDFDocument must have a path specified!');
     }
     if (this.document.modifyPages !== undefined) {
+      console.warn('doc target path', this.document.targetPath);
+
       return PDFLib.modifyPDF(this.document);
     }
     if (this.document.pages.length < 1) {
       return Promise.reject('PDFDocument must have at least one page!');
     }
+
     return PDFLib.createPDF(this.document);
   }
 }

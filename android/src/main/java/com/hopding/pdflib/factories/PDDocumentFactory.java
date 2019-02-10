@@ -1,5 +1,8 @@
 package com.hopding.pdflib.factories;
 
+import android.content.Context;
+import android.content.res.AssetManager;
+
 import com.facebook.react.bridge.NoSuchKeyException;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
@@ -8,6 +11,7 @@ import com.tom_roush.pdfbox.pdmodel.PDPage;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Creates a PDDocument object and applies actions from a JSON
@@ -18,6 +22,13 @@ public class PDDocumentFactory {
 
     private PDDocument document;
     private String path;
+    private static AssetManager ASSET_MANAGER = null;
+
+    public static void init(Context context){
+        if (ASSET_MANAGER == null) {
+            ASSET_MANAGER = context.getApplicationContext().getAssets();
+        }
+    }
 
     private PDDocumentFactory(PDDocument document, ReadableMap documentActions) {
         this.path     = documentActions.getString("path");
@@ -35,7 +46,10 @@ public class PDDocumentFactory {
 
     public static PDDocument modify(ReadableMap documentActions) throws NoSuchKeyException, IOException {
         String path = documentActions.getString("path");
-        PDDocument document = PDDocument.load(new File(path));
+
+        InputStream pdfStream = ASSET_MANAGER.open(path);
+
+        PDDocument document = PDDocument.load(pdfStream);
         PDDocumentFactory factory = new PDDocumentFactory(document, documentActions);
 
         factory.modifyPages(documentActions.getArray("modifyPages"));
