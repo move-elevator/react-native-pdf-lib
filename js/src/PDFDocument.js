@@ -104,8 +104,6 @@ export default class PDFDocument {
       return Promise.reject('PDFDocument must have a path specified!');
     }
     if (this.document.modifyPages !== undefined) {
-      console.warn('doc target path', this.document.targetPath);
-
       return PDFLib.modifyPDF(this.document);
     }
     if (this.document.pages.length < 1) {
