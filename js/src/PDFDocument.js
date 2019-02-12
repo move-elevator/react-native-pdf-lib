@@ -1,6 +1,7 @@
 /* @flow */
 import PDFLib from './PDFLib';
 import PDFPage from './PDFPage';
+import { Platform } from 'react-native';
 
 import type { PageAction } from './PDFPage';
 
@@ -34,11 +35,14 @@ export default class PDFDocument {
 
   static modify = (path: string, targetPath: string) => {
     const pdfDocument = new PDFDocument();
-    pdfDocument.setPath(path);
 
-    pdfDocument.setTargetPath(targetPath);
     if (targetPath === '') {
       pdfDocument.setTargetPath(path);
+    }
+
+    if (Platform.OS === 'ios') {
+      pdfDocument.setPath(path);
+      pdfDocument.setTargetPath(targetPath);
     }
 
     pdfDocument.document.modifyPages = [];
