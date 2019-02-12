@@ -41,8 +41,8 @@ export default class PDFDocument {
     }
 
     if (Platform.OS === 'ios') {
-      pdfDocument.setPath(path);
-      pdfDocument.setTargetPath(targetPath);
+      pdfDocument.setPath(targetPath);
+      pdfDocument.setTargetPath(path);
     }
 
     pdfDocument.document.modifyPages = [];
