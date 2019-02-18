@@ -36,6 +36,9 @@ export default class PDFDocument {
   static modify = (path: string, targetPath: string) => {
     const pdfDocument = new PDFDocument();
 
+    pdfDocument.setPath(path);
+    pdfDocument.setTargetPath(targetPath);
+
     if (targetPath === '') {
       pdfDocument.setTargetPath(path);
     }
@@ -102,8 +105,6 @@ export default class PDFDocument {
   }
 
   write = () => {
-    // console.log('Creating this PDFDocument:');
-    // console.log(this.document);
     if (!this.document.path) {
       return Promise.reject('PDFDocument must have a path specified!');
     }
